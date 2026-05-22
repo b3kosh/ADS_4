@@ -1,20 +1,24 @@
+import java.util.Random;
+
 public class Main {
-    //
     public static void main(String[] args) {
         int[] sizes = {10, 30, 100};
+        Random random = new Random();
 
         for (int size : sizes) {
             System.out.println("Graph Size: " + size);
             Graph g = new Graph();
-
 
             for (int i = 0; i < size; i++) {
                 g.addVertex(new Vertex(i));
             }
 
             for (int i = 0; i < size; i++) {
-                g.addEdge(i, (i + 1) % size);
-                g.addEdge(i, (i * 2) % size);
+                int weight1 = random.nextInt(10) + 1;
+                int weight2 = random.nextInt(10) + 1;
+
+                g.addEdge(i, (i + 1) % size, weight1);
+                g.addEdge(i, (i * 2) % size, weight2);
             }
 
             System.out.println("Graph Structure:");

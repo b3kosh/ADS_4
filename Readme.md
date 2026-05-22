@@ -51,3 +51,46 @@ The algorithms were tested on three graph sizes to analyze performance scaling.
 During this assignment, I learned how graph representation impacts the efficiency of traversal. The primary difference discovered is that BFS is optimal for finding the shortest distance, while DFS is better for exploring deep structures.
 
 One of the main challenges was managing the `nanoTime()` measurements accurately to ensure the overhead did not skew the results. Additionally, implementing the adjacency list using a Map structure provided a flexible way to handle graphs of varying sizes.
+
+## Analysis Questions
+
+### 1. How does graph size affect BFS and DFS performance?
+As the graph size (number of vertices $V$ and edges $E$) increases, the execution time for both BFS and DFS increases linearly. In the experiments with sizes 10, 30, and 100, the time measurements (in nanoseconds) clearly show a growth trend, as the algorithms have to visit more nodes and process more adjacencies.
+
+### 2. Which traversal is faster in your experiments?
+In most runs, **DFS** tends to be slightly faster or comparable to BFS. This happens because BFS utilizes a `Queue` data structure (`LinkedList`) which introduces minor overhead due to frequent object allocation and queue operations (`add` and `poll`). DFS, being implemented via recursion, uses the system call stack which is highly optimized in Java.
+
+### 3. Do results match the expected complexity $O(V + E)$?
+Yes, the results match the theoretical time complexity of $O(V + E)$. The execution time scales proportionally to the number of vertices and edges. Any small fluctuations or non-linear jumps in nanoseconds for smaller sizes (like 10 or 30) are due to JVM warm-up, JIT compilation, and background system processes, rather than the algorithms themselves.
+
+### 4. How does graph structure affect traversal order?
+The structure determines the path the traversal takes:
+* **BFS** explores the graph level-by-level (broadly). It visits all immediate neighbors of the starting node first, then moves to their neighbors, and so on.
+* **DFS** explores as deep as possible along each branch before backtracking. It follows a single path to its absolute end before turning back to check other unvisited options.
+
+### 5. When is BFS preferred over DFS?
+BFS is preferred when:
+* You need to find the **shortest path** (in terms of the minimum number of edges) in an unweighted graph.
+* The target node is likely close to the starting source.
+* You are analyzing structures layer by layer (e.g., finding peer-to-peer connections within a specific distance).
+
+### 6. What are the limitations of DFS?
+* **Not guaranteed to find the shortest path:** DFS might find a much longer path to a target node first just because it blindly follows a deep branch.
+* **Stack Overflow risk:** In very deep or massive graphs (e.g., a straight chain of 10,000+ nodes), a recursive DFS implementation can trigger a `StackOverflowError` due to deep recursion.
+* **Memory usage in deep trees:** While DFS usually uses less memory than BFS on wide graphs, its memory footprint scales with the maximum depth of the graph due to the call stack.
+
+
+
+
+## Bonus Task: Dijkstra's Algorithm
+
+### Description
+Implemented Dijkstra's algorithm to find the shortest path from a starting vertex to all other vertices in the graph.
+
+### Changes Made
+* **Edge Class**: Added a `weight` field and updated the constructor and getters.
+* **Graph Class**:
+    * Updated the adjacency list structure (`Map<Integer, List<Edge>>`) to store weighted edges instead of simple integers.
+    * Adapted `bfs` and `dfs` methods to work seamlessly with the new graph structure.
+    * Implemented the `dijkstra(int start)` method using arrays for distances and visited nodes with simple loops (no priority queue used).
+* **Main & Experiment Classes**: Added random edge weight generation (from 1 to 10) and performance time measurement for the Dijkstra algorithm.

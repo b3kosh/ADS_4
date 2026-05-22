@@ -1,26 +1,82 @@
 import java.util.*;
 
 public class Graph {
-    //
-    private Map<Integer, List<Integer>> adjList;
+    private Map<Integer, List<Edge>> adjList;
+    private Map<Integer, Vertex> vertices;
 
     public Graph() {
         this.adjList = new HashMap<>();
+        this.vertices = new HashMap<>();
     }
 
     public void addVertex(Vertex v) {
         adjList.putIfAbsent(v.getId(), new ArrayList<>());
+        vertices.put(v.getId(), v);
     }
 
-    public void addEdge(int from, int to) {
+    public void addEdge(int from, int to, int weight) {
         if (adjList.containsKey(from) && adjList.containsKey(to)) {
-            adjList.get(from).add(to);
+            Vertex src = vertices.get(from);
+            Vertex dest = vertices.get(to);
+            Edge edge = new Edge(src, dest, weight);
+            adjList.get(from).add(edge);
         }
     }
 
     public void printGraph() {
-        for (Map.Entry<Integer, List<Integer>> entry : adjList.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+        for (Map.Entry<Integer, List<Edge>> entry : adjList.entrySet()) {
+            System.out.print(entry.getKey() + ": ");
+            List<String> edgesStr = new ArrayList<>();
+            for (Edge edge : entry.getValue()) {
+                edgesStr.add(edge.getDestination().getId() + "(w:" + edge.getWeight() + ")");
+            }
+            System.out.println(edgesStr);
+        }
+    }
+
+    public void dijkstra(int start) {
+        int numVertices = adjList.size();
+        int[] distances = new int[numVertices];
+        boolean[] visited = new boolean[numVertices];
+
+        Arrays.fill(distances, Integer.MAX_VALUE);
+        distances[start] = 0;
+
+        for (int i = 0; i < numVertices; i++) {
+            int minVertex = -1;
+            int minDistance = Integer.MAX_VALUE;
+
+            for (int j = 0; j < numVertices; j++) {
+                if (!visited[j] && distances[j] < minDistance) {
+                    minDistance = distances[j];
+                    minVertex = j;
+                }
+            }
+
+            if (minVertex == -1) {
+                break;
+            }
+
+            visited[minVertex] = true;
+
+            List<Edge> neighbors = adjList.getOrDefault(minVertex, new ArrayList<>());
+            for (Edge edge : neighbors) {
+                int neighborId = edge.getDestination().getId();
+
+                if (!visited[neighborId]) {
+                    int currentWeight = edge.getWeight();
+                    if (distances[minVertex] != Integer.MAX_VALUE &&
+                            distances[minVertex] + currentWeight < distances[neighborId]) {
+                        distances[neighborId] = distances[minVertex] + currentWeight;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Dijkstra Shortest Paths from node " + start + ":");
+        for (int i = 0; i < numVertices; i++) {
+            String distStr = (distances[i] == Integer.MAX_VALUE) ? "Unreachable" : String.valueOf(distances[i]);
+            System.out.println("  To node " + i + " -> Distance: " + distStr);
         }
     }
 
@@ -35,11 +91,12 @@ public class Graph {
             int v = queue.poll();
             System.out.print(v + " ");
 
-            List<Integer> neighbors = adjList.getOrDefault(v, new ArrayList<>());
-            for (int neighbor : neighbors) {
-                if (!visited.contains(neighbor)) {
-                    visited.add(neighbor);
-                    queue.add(neighbor);
+            List<Edge> neighbors = adjList.getOrDefault(v, new ArrayList<>());
+            for (Edge edge : neighbors) {
+                int neighborId = edge.getDestination().getId();
+                if (!visited.contains(neighborId)) {
+                    visited.add(neighborId);
+                    queue.add(neighborId);
                 }
             }
         }
@@ -56,10 +113,11 @@ public class Graph {
         visited.add(v);
         System.out.print(v + " ");
 
-        List<Integer> neighbors = adjList.getOrDefault(v, new ArrayList<>());
-        for (int neighbor : neighbors) {
-            if (!visited.contains(neighbor)) {
-                dfsRecursive(neighbor, visited);
+        List<Edge> neighbors = adjList.getOrDefault(v, new ArrayList<>());
+        for (Edge edge : neighbors) {
+            int neighborId = edge.getDestination().getId();
+            if (!visited.contains(neighborId)) {
+                dfsRecursive(neighborId, visited);
             }
         }
     }

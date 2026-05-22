@@ -1,5 +1,4 @@
 public class Experiment {
-    //
     public static void runTraversals(Graph g, int startNode, boolean printOrder) {
         if (printOrder) System.out.print("BFS Order: ");
         long startBfs = System.nanoTime();
@@ -13,6 +12,12 @@ public class Experiment {
 
         System.out.println("BFS Time: " + (endBfs - startBfs) + " ns");
         System.out.println("DFS Time: " + (endDfs - startDfs) + " ns");
+
+        long startDijkstra = System.nanoTime();
+        g.dijkstra(startNode);
+        long endDijkstra = System.nanoTime();
+        System.out.println("Dijkstra Time: " + (endDijkstra - startDijkstra) + " ns");
+
         System.out.println("-------------------------");
     }
 }
